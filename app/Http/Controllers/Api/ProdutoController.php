@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProdutoResource;
 use App\Models\Produto;
+use App\Services\ProdutoService;
 use Illuminate\Http\Request;
 
 class ProdutoController extends Controller
 {
+    public function __construct(private ProdutoService $service) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -25,12 +28,13 @@ class ProdutoController extends Controller
         $dados = $request->validate([
             'nome' => ['required', 'string', 'max:255'],
             'descricao' => 'nullable|string',
+            'preco_custo' => ['required', 'numeric', 'min:0'],
             'preco' => ['required', 'numeric', 'min:0'],
             'quantidade' => 'sometimes|integer|min:0',
         ]);
 
         // Cria o Produto (Model)
-        $produto = Produto::create($dados);
+        $produto = $this->service->create($dados);
 
         // Retorna um novo Recurso a cada requisição
         return new ProdutoResource($produto);
@@ -52,11 +56,12 @@ class ProdutoController extends Controller
         $dados = $request->validate([
             'nome' => ['sometimes', 'string', 'max:255'],
             'descricao' => 'nullable|string',
+            'preco_custo' => ['sometimes', 'numeric', 'min:0'],
             'preco' => ['sometimes', 'numeric', 'min:0'],
             'quantidade' => 'sometimes|integer|min:0',
         ]);
 
-        $produto->update($dados);
+        $produto = $this->service->update($produto, $dados);
 
         return new ProdutoResource($produto);
     }

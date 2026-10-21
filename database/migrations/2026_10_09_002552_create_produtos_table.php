@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nome');
             $table->text('descricao')->nullable();
+            $table->decimal('preco_custo', 10, 2);
             $table->decimal('preco', 10, 2);
             $table->integer('quantidade')->default(0);
             $table->timestamps();
